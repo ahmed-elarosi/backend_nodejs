@@ -1,6 +1,9 @@
-import { PrismaClient } from "@prisma/client";
+import "dotenv/config";
+import { prisma } from "../src/config/db.js";
 
-const prisma = new PrismaClient();
+// const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+
+//const prisma = new PrismaClient();
 const creatorId = process.env.SEED_USER_ID;
 
 const movies = [
@@ -12,7 +15,7 @@ const movies = [
         genres: ["Sci-Fi", "Drama"],
         runtime: 118,
         posterUrl: "https://example.com/posters/silent-horizon.jpg",
-        createdBy: userId,
+        createdBy: { connect: { id: { connect: { id: creatorId } } } },
     },
     {
         title: "Crimson Chase",
@@ -22,7 +25,7 @@ const movies = [
         genres: ["Action", "Thriller"],
         runtime: 105,
         posterUrl: "https://example.com/posters/crimson-chase.jpg",
-        createdBy: userId,
+        createdBy: { connect: { id: creatorId } },
     },
     {
         title: "Echoes of Yesterday",
@@ -32,7 +35,7 @@ const movies = [
         genres: ["Drama", "Mystery"],
         runtime: 112,
         posterUrl: "https://example.com/posters/echoes-yesterday.jpg",
-        createdBy: userId,
+        createdBy: { connect: { id: creatorId } },
     },
     {
         title: "Pixel Warriors",
@@ -42,7 +45,7 @@ const movies = [
         genres: ["Adventure", "Comedy", "Fantasy"],
         runtime: 97,
         posterUrl: "https://example.com/posters/pixel-warriors.jpg",
-        createdBy: userId,
+        createdBy: { connect: { id: creatorId } },
     },
     {
         title: "Frozen Divide",
@@ -52,7 +55,7 @@ const movies = [
         genres: ["Sci-Fi", "Horror", "Thriller"],
         runtime: 110,
         posterUrl: "https://example.com/posters/frozen-divide.jpg",
-        createdBy: userId,
+        createdBy: { connect: { id: creatorId } },
     },
     {
         title: "The Last Symphony",
@@ -62,7 +65,7 @@ const movies = [
         genres: ["Drama", "Music"],
         runtime: 124,
         posterUrl: "https://example.com/posters/last-symphony.jpg",
-        createdBy: userId,
+        createdBy: { connect: { id: creatorId } },
     },
     {
         title: "Midnight Heist",
@@ -71,7 +74,7 @@ const movies = [
         genres: ["Crime", "Thriller"],
         runtime: 108,
         posterUrl: "https://example.com/posters/midnight-heist.jpg",
-        createdBy: userId,
+        createdBy: { connect: { id: creatorId } },
     },
     {
         title: "Beyond the Valley",
@@ -81,7 +84,7 @@ const movies = [
         genres: ["Adventure", "Fantasy"],
         runtime: 115,
         posterUrl: "https://example.com/posters/beyond-valley.jpg",
-        createdBy: userId,
+        createdBy: { connect: { id: creatorId } },
     },
     {
         title: "Digital Shadows",
@@ -91,7 +94,7 @@ const movies = [
         genres: ["Tech", "Thriller"],
         runtime: 102,
         posterUrl: "https://example.com/posters/digital-shadows.jpg",
-        createdBy: userId,
+        createdBy: { connect: { id: creatorId } },
     },
     {
         title: "Golden Summer",
@@ -101,10 +104,25 @@ const movies = [
         genres: ["Romance", "Drama"],
         runtime: 99,
         posterUrl: "https://example.com/posters/golden-summer.jpg",
-        createdBy: userId,
+        createdBy: { connect: { id: creatorId } },
     },
 ];
 
 const main = async () => {
     console.log("Seeding movies...");
+
+    for (const movie of movies) {
+        await prisma.movie.create({ data: movie });
+        console.log(`Created movie: ${movie.title}`);
+    }
+    console.log("Seeding Completed!!");
 };
+
+main()
+    .catch((err) => {
+        console.log(err);
+        process.exit(1);
+    })
+    .finally(async () => {
+        await prisma.$disconnect();
+    });
